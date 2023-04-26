@@ -1,0 +1,67 @@
+Question-1:
+
+import pandas as pd
+import plotly.express as px
+
+df = pd.read_csv('fuel-efficiency.csv')
+
+fig = px.line_polar(df, r='efficiency', 
+                    theta=[30*i for i in range(12)], 
+                    line_close=True,
+                     line_shape='spline'
+                   )
+
+fig.update_layout(
+    polar=dict(
+        radialaxis=dict(
+            showticklabels=True,
+            ticks='outside',
+            tickangle=0,
+            tickfont=dict(size=10),
+            range=[0, 12],
+            tickmode='array',
+            tickvals=[0, 2, 4, 6, 8, 10, 12]
+        ),
+        angularaxis=dict(
+            direction='clockwise',
+            showticklabels=True,
+            tickfont=dict(size=12),
+            tickvals=[30*i for i in range(12)],
+            ticktext=['January', 'February', 'March', 'April', 'May', 'June', 
+                      'July', 'August', 'September', 'October', 'November', 'December']
+        )
+    ),
+    # showlegend=False
+)
+
+fig.show()
+
+
+
+Question-2:
+
+
+import pandas as pd
+import geopandas as gpd
+import matplotlib.pyplot as plt
+
+students = pd.read_csv('students.csv')
+
+students['Percentage of students'] = students['Total students'] / students['Population'] * 100
+
+province = pd.DataFrame({'Province': ['Alberta', 'British Columbia', 'Manitoba', 'New Brunswick',
+                                         'Newfoundland and Labrador', 'Northwest Territories', 'Nova Scotia',
+                                         'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan',
+                                         'Territories', 'Yukon'],
+                            'Percentage of students': [0]*14})
+
+merged_students = pd.concat([students, province]).groupby('Province').sum().reset_index()
+
+canada = gpd.read_file('canada.shp')
+
+merged = canada.merge(merged_students, on='Province')
+
+ax = merged.plot(column='Percentage of students', cmap='Reds', edgecolor='black', linewidth=0.5, legend=False, ax=None)
+ax.set_axis_off()
+plt.title('Students as Percentage of Population', fontdict={'fontsize': '15', 'fontweight' : '2'})
+plt.show()
